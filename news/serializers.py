@@ -14,9 +14,10 @@ class MediumSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     counter = serializers.SerializerMethodField()
     wgt = serializers.SerializerMethodField()
+    computed_time = serializers.SerializerMethodField()
     class Meta:
         model = models.Event
-        fields = ['id', 'title', 'summary', 'date', 'counter', 'wgt']
+        fields = ['id', 'title', 'summary', 'date', 'computed_time', 'counter', 'wgt']
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)
@@ -25,6 +26,9 @@ class EventSerializer(serializers.ModelSerializer):
         data = dict(Counter(slants))
         data.update({'total': all_count})
         return data
+
+    def get_computed_time(self, obj):
+        return obj.articles.earliest("datetime").datetime
 
     def get_wgt(self, obj):
 
