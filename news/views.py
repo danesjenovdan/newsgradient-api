@@ -1,4 +1,5 @@
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q, F, FloatField
+from django.db.models.functions import Cast
 
 from rest_framework import viewsets, mixins, permissions
 
@@ -16,11 +17,15 @@ class EventViewSet(viewsets.ModelViewSet):
         time_range = self.request.GET.get('range', 'today')
         slant = self.request.GET.get('slant', 'all')
 
+        # get all events and annotate field count of articles per event
         events = models.Event.objects.all().annotate(
-            all_count=Count(
-                'articles',
-                filter=Q(articles__medium__slant__isnull=False),
-                distinct=True
+            all_count=Cast(
+                Count(
+                    'articles',
+                    filter=Q(articles__medium__slant__isnull=False),
+                    distinct=True
+                ),
+                FloatField()
             )
         )
 
@@ -37,22 +42,27 @@ class EventViewSet(viewsets.ModelViewSet):
 
         if slant == 'all':
             return  events.annotate(
-                this_count=Count(
-                    'articles'
+                this_count=Cast(
+                    Count(
+                        'articles'
+                    ),
+                    FloatField()
                 )
             ).order_by('-all_count')
         else:
             print('slant order')
-            events = events.filter(articles__medium__slant=slant).distinct()
-
-            # added fields for all articles count and count for articles this slant
+            events = events.filter(articles__medium__slant=slant)
+            # annotate field count of articles of this slant per event and returns orderd queryset
             return events.annotate(
-                this_count=Count(
-                    'articles',
-                    filter=Q(articles__medium__slant=slant),
-                    distinct=True
+                this_count=Cast(
+                    Count(
+                        'articles',
+                        filter=Q(articles__medium__slant=slant),
+                        distinct=True
+                    ),
+                    FloatField()
                 )
-            ).order_by(F('this_count')/F('all_count'))
+            ).annotate(ordering=F('this_count')/F('all_count')).order_by('-ordering')
 
 
 
