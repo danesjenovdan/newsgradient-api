@@ -37,4 +37,4 @@ class ArticleSerializer(serializers.ModelSerializer):
     medium = MediumSerializer()
     class Meta:
         model = models.Article
-        fields =  ['title', 'content', 'image', 'sentiment', 'medium', 'datetime']
+        fields =  ['title', 'content', 'image', 'sentiment', 'medium', 'datetime', 'url']
