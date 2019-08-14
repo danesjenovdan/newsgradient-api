@@ -41,7 +41,7 @@ class EventViewSet(viewsets.ModelViewSet):
             events = events.all()
 
         if slant == 'all':
-            return  events.annotate(
+            return  events.exclude(articles__isnull=True).annotate(
                 this_count=Cast(
                     Count(
                         'articles'
