@@ -100,8 +100,8 @@ class Refresher(object):
             except:
                 #print('event doesnt exist')
                 return False
-            #if 'eng' not in data['title'].keys():
-            #    return
+            if 'eng' ==  data['lang']:
+                return
 
             models.Article(
                 medium=medium,
