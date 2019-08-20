@@ -48,6 +48,7 @@ class Article(models.Model):
     event = models.ForeignKey('Event', related_name='articles', on_delete=models.CASCADE)
 
     sentiment = models.FloatField(null=True, blank=True)
+    sentimentRNN = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.title

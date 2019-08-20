@@ -127,9 +127,14 @@ class Refresher(object):
         analytics = Analytics(self.er)
         print("Articles: ", models.Article.objects.all().count())
         print("Articles without sentiment: ", models.Article.objects.filter(sentiment=None).count())
-        for article in models.Article.objects.filter(sentiment=None):
-            cat = analytics.sentiment(article.content)
-            article.sentiment = cat['avgSent']
+        for article in models.Article.objects.filter(sentimentRNN=None):
+            if not article.sentiment:
+                cat = analytics.sentiment(article.content)
+                article.sentiment = cat['avgSent']
+
+            catRNN = analytics.sentiment(article.content, method='rnn')
+            article.sentimentRNN = catRNN['avgSent']
+
             article.save()
 
     def get_favicons(self):
