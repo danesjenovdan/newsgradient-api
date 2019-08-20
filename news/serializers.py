@@ -8,7 +8,7 @@ from news import models
 class MediumSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Medium
-        fields = ['title', 'slant']
+        fields = ['title', 'slant', 'favicon']
 
 
 class EventSerializer(serializers.ModelSerializer):
