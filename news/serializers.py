@@ -19,7 +19,7 @@ class EventSerializer(serializers.ModelSerializer):
     most = serializers.SerializerMethodField()
     class Meta:
         model = models.Event
-        fields = ['id', 'title', 'summary', 'date', 'computed_time', 'counter', 'wgt']
+        fields = ['id', 'title', 'summary', 'date', 'computed_time', 'counter', 'wgt', 'first_article', 'most']
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)
