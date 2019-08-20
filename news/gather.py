@@ -4,7 +4,10 @@ from eventregistry import *
 
 from news import models
 
-from datetime import datetime
+from datetime import datetime, timedelta
+
+import favicon
+import requests
 
 
 class Refresher(object):
@@ -12,13 +15,16 @@ class Refresher(object):
         self.er = EventRegistry(apiKey=settings.ER_API_KEY)
         self.events = list(models.Event.objects.values_list('uri', flat=True))
         self.articles = list(models.Article.objects.values_list('uri', flat=True))
+
+    def start(self):
         self.refresh_data()
+        self.set_semtiment()
 
     def refresh_data(self):
         q=QueryEvents(
             categoryUri=self.er.getCategoryUri("politics"),
-            dateStart="2019-08-12",
-            dateEnd="2019-08-14",
+            dateStart=datetime.today().strftime("%Y-%m-%d"),
+            dateEnd=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
             sourceLocationUri=self.er.getLocationUri("USA"),
             conceptUri=self.er.getConceptUri("USA"))
         page = 1
@@ -38,8 +44,8 @@ class Refresher(object):
 
         q = QueryArticles(
             categoryUri=self.er.getCategoryUri("politics"),
-            dateStart="2019-08-12",
-            dateEnd="2019-08-14",
+            dateStart=datetime.today().strftime("%Y-%m-%d"),
+            dateEnd=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
             sourceLocationUri=self.er.getLocationUri("USA"),
             conceptUri=self.er.getConceptUri("USA"))
         page = 1
@@ -119,5 +125,37 @@ class Refresher(object):
 
     def set_semtiment(self):
         analytics = Analytics(self.er)
-        for article in Article.object.filter(sentiment=None):
+        print("Articles: ", models.Article.objects.all().count())
+        print("Articles without sentiment: ", models.Article.objects.filter(sentiment=None).count())
+        for article in models.Article.objects.filter(sentiment=None):
             cat = analytics.sentiment(article.content)
+            article.sentiment = cat['avgSent']
+            article.save()
+
+    def get_favicons(self):
+        for medium in models.Medium.objects.filter(favicon=None):
+            print(medium.title)
+            try:
+                icons = favicon.get('http://' + medium.uri)
+            except:
+                pass
+            png_icons = list(filter(lambda x: x.format == 'png', icons))
+            ico_icons = list(filter(lambda x: x.format == 'ico', icons))
+            ss_png_icons = list(filter(lambda x: x.width == x.height and x.width > 0, png_icons))
+            found = False
+            for img in ss_png_icons:
+                try:
+                    if requests.get(img.url).status_code == 200:
+                        medium.favicon = img.url
+                        medium.save()
+                        found = True
+                except:
+                    pass
+                if found:
+                    break
+            if not found and ico_icons:
+                print(ico_icons)
+                ico_response = requests.get(ico_icons[0].url)
+                if ico_response.status_code == 200:
+                    medium.favicon = ico_response.url
+                    medium.save()

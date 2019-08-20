@@ -11,6 +11,11 @@ class Medium(models.Model):
     )
     title = models.CharField(max_length=128)
     uri = models.CharField(max_length=128, db_index=True)
+    favicon = models.URLField(
+        max_length=512,
+        null=True,
+        blank=True
+    )
     slant = models.CharField(
         max_length=10,
         choices=ORIENTATIONS,

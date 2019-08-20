@@ -25,3 +25,5 @@ sqlparse==0.3.0
 traitlets==4.3.2
 urllib3==1.25.3
 wcwidth==0.1.7
+django-crontab==0.7.1
+favicon==0.6.0

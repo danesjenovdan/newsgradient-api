@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'corsheaders',
+    'django_crontab',
 
     'news',
 ]
@@ -141,4 +142,8 @@ ORDER_TRASHOLD = 5 # THRESHOLD
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-ER_API_KEY = "****"
+ER_API_KEY = "bffa61a3-e09e-46de-bf9c-6966615bac71"
+
+CRONJOBS = [
+    ('*/30 * * * *', 'news.cron.get_new_news')
+]
