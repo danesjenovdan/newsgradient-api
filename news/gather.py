@@ -23,8 +23,8 @@ class Refresher(object):
     def refresh_data(self):
         q=QueryEvents(
             categoryUri=self.er.getCategoryUri("politics"),
-            dateStart=datetime.today().strftime("%Y-%m-%d"),
-            dateEnd=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
+            dateStart=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
+            dateEnd=datetime.today().strftime("%Y-%m-%d"),
             sourceLocationUri=self.er.getLocationUri("USA"),
             conceptUri=self.er.getConceptUri("USA"))
         page = 1
@@ -44,8 +44,8 @@ class Refresher(object):
 
         q = QueryArticles(
             categoryUri=self.er.getCategoryUri("politics"),
-            dateStart=datetime.today().strftime("%Y-%m-%d"),
-            dateEnd=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
+            dateStart=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
+            dateEnd=datetime.today().strftime("%Y-%m-%d"),
             sourceLocationUri=self.er.getLocationUri("USA"),
             conceptUri=self.er.getConceptUri("USA"))
         page = 1
@@ -106,7 +106,7 @@ class Refresher(object):
             except:
                 #print('event doesnt exist')
                 return False
-            if 'eng' ==  data['lang']:
+            if 'eng' !=  data['lang']:
                 return
 
             models.Article(
