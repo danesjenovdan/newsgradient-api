@@ -15,6 +15,8 @@ class EventSerializer(serializers.ModelSerializer):
     counter = serializers.SerializerMethodField()
     wgt = serializers.SerializerMethodField()
     computed_time = serializers.SerializerMethodField()
+    first_article = serializers.SerializerMethodField()
+    most = serializers.SerializerMethodField()
     class Meta:
         model = models.Event
         fields = ['id', 'title', 'summary', 'date', 'computed_time', 'counter', 'wgt']
@@ -26,6 +28,15 @@ class EventSerializer(serializers.ModelSerializer):
         data = dict(Counter(slants))
         data.update({'total': all_count})
         return data
+
+    def get_most(self, obj):
+        all_articles = obj.articles.exclude(medium__slant=None)
+        positive = all_articles.latest("sentiment")
+        negative = all_articles.earliest("sentiment")
+        return {'positive': ArticleSerializer(positive).data, 'negative': ArticleSerializer(negative).data}
+
+    def get_first_article(self, obj):
+        return obj.articles.exclude(medium__slant=None).earliest('datetime').datetime
 
     def get_computed_time(self, obj):
         return obj.articles.earliest("datetime").datetime
