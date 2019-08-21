@@ -12,14 +12,24 @@ class MediumSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    counter = serializers.SerializerMethodField()
-    wgt = serializers.SerializerMethodField()
+    #counter = serializers.SerializerMethodField()
+    #wgt = serializers.SerializerMethodField()
     computed_time = serializers.SerializerMethodField()
     first_article = serializers.SerializerMethodField()
-    most = serializers.SerializerMethodField()
+    #most = serializers.SerializerMethodField()
     class Meta:
         model = models.Event
-        fields = ['id', 'title', 'summary', 'date', 'computed_time', 'counter', 'wgt', 'first_article', 'most']
+        fields = [
+            'id',
+            'title',
+            'summary',
+            'date',
+            'computed_time',
+            #'counter',
+            'first_article',
+            #'most',
+            #'wgt',
+        ]
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)
@@ -43,9 +53,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     def get_wgt(self, obj):
 
-        return {'this_count': obj.this_count, 'all_count': obj.all_count}
-
-
+        return {'this_count': obj.this_count, 'all_count': obj.all_count, 'score': obj.this_count/obj.all_count}
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -55,7 +63,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields =  [
             'id',
             'title',
-            'content',
+            #'content',
             'image',
             'sentiment',
             'sentimentRNN',
