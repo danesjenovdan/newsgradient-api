@@ -25,11 +25,18 @@ class EventSerializer(serializers.ModelSerializer):
             'summary',
             'date',
             'computed_time',
+            'count'
             #'counter',
             #'first_article',
             #'most',
             #'wgt',
         ]
+
+    def get_count(self, obj):
+        return obj.articles.exclude(medium__slant=None).count()
+
+    def get_computed_time(self, obj):
+        return obj.articles.earliest("datetime").datetime
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)
@@ -47,9 +54,6 @@ class EventSerializer(serializers.ModelSerializer):
 
     def get_first_article(self, obj):
         return obj.articles.exclude(medium__slant=None).earliest('datetime').datetime
-
-    def get_computed_time(self, obj):
-        return obj.articles.earliest("datetime").datetime
 
     def get_wgt(self, obj):
 
