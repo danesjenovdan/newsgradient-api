@@ -4,6 +4,8 @@ from collections import Counter
 
 from news import models
 
+import random
+
 
 class MediumSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,6 +16,7 @@ class MediumSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     count = serializers.SerializerMethodField()
     computed_time = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
     #counter = serializers.SerializerMethodField()
     #wgt = serializers.SerializerMethodField()
     #first_article = serializers.SerializerMethodField()
@@ -28,6 +31,7 @@ class EventSerializer(serializers.ModelSerializer):
             'computed_time',
             'count',
             'is_hidden',
+            'image',
             #'counter',
             #'first_article',
             #'most',
@@ -39,6 +43,9 @@ class EventSerializer(serializers.ModelSerializer):
 
     def get_computed_time(self, obj):
         return obj.articles.earliest("datetime").datetime
+
+    def get_image(self, obj):
+        return random.choice(obj.articles.all()).image
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)
