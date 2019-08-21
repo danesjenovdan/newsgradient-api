@@ -12,7 +12,7 @@ class MediumSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    counte = serializers.SerializerMethodField()
+    count = serializers.SerializerMethodField()
     computed_time = serializers.SerializerMethodField()
     #counter = serializers.SerializerMethodField()
     #wgt = serializers.SerializerMethodField()
@@ -69,7 +69,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields =  [
             'id',
             'title',
-            #'content',
+            'content',
             'image',
             'sentiment',
             'sentimentRNN',
