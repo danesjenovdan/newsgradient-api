@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.db.models import Count, Q, IntegerField
+from django.db.models.functions import Cast
+
 from news import models
 # Register your models here.
 
@@ -10,13 +13,26 @@ class MediumAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['title', 'date', 'get_articles_count', 'is_hidden']
+    list_display = ['title', 'date', 'number_of_articles', 'is_hidden']
     search_fields = ['title', 'summary']
     list_filter = ['date', 'is_hidden']
     list_editable = ('is_hidden',)
 
-    def get_articles_count(self, obj):
-        return obj.articles.count()
+    def get_queryset(self, request):
+        return models.Event.objects.all().annotate(
+            all_count=Cast(
+                Count(
+                    'articles',
+                    filter=Q(articles__medium__slant__isnull=False),
+                    distinct=True
+                ),
+                IntegerField()
+            )
+        )
+
+    def number_of_articles(self, obj):
+        return obj.all_count
+
 
 admin.site.register(models.Medium, MediumAdmin)
 admin.site.register(models.Event, EventAdmin)
