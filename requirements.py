@@ -27,3 +27,5 @@ urllib3==1.25.3
 wcwidth==0.1.7
 django-crontab==0.7.1
 favicon==0.6.0
+beautifulsoup4==4.8.0
+metadata-parser==0.10.0

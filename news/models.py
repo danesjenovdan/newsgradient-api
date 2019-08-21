@@ -50,5 +50,21 @@ class Article(models.Model):
     sentiment = models.FloatField(null=True, blank=True)
     sentimentRNN = models.FloatField(null=True, blank=True)
 
+    og_title = models.CharField(
+        max_length=512,
+        null=True,
+        blank=True
+    )
+    og_image = models.CharField(
+        max_length=512,
+        null=True,
+        blank=True
+    )
+    og_description = models.CharField(
+        max_length=512,
+        null=True,
+        blank=True
+    )
+
     def __str__(self):
         return self.title

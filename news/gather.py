@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 
 import favicon
 import requests
+import metadata_parser
 
 
 class Refresher(object):
@@ -164,3 +165,26 @@ class Refresher(object):
                 if ico_response.status_code == 200:
                     medium.favicon = ico_response.url
                     medium.save()
+
+
+    def get_og_tags(self):
+        articles = models.Article.objects.filter(og_title=None)
+        all = articles.count()
+        i=0
+        for article in articles:
+            print(article.url)
+            i+=1
+            try:
+                page = metadata_parser.MetadataParser(url=article.url)
+            except:
+                continue
+            article.og_title = get_first_or_none(page.get_metadatas('title', strategy=['og',]))
+            article.og_description = get_first_or_none(page.get_metadatas('description', strategy=['og',]))
+            article.og_image = get_first_or_none(page.get_metadatas('image', strategy=['og',]))
+            article.save()
+            print(i, 'of', all)
+
+
+
+def get_first_or_none(item):
+    return item[0] if item else None
