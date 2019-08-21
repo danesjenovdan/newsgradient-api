@@ -15,7 +15,7 @@ class EventSerializer(serializers.ModelSerializer):
     #counter = serializers.SerializerMethodField()
     #wgt = serializers.SerializerMethodField()
     computed_time = serializers.SerializerMethodField()
-    first_article = serializers.SerializerMethodField()
+    #first_article = serializers.SerializerMethodField()
     #most = serializers.SerializerMethodField()
     class Meta:
         model = models.Event
@@ -26,7 +26,7 @@ class EventSerializer(serializers.ModelSerializer):
             'date',
             'computed_time',
             #'counter',
-            'first_article',
+            #'first_article',
             #'most',
             #'wgt',
         ]
