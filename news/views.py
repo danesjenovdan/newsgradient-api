@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EventSerializer
     queryset = models.Event.objects.all()
+    filter_fields = ('is_hidden',)
 
     def get_queryset(self):
         time_range = self.request.GET.get('range', 'today')
