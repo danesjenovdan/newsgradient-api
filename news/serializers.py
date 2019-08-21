@@ -12,9 +12,10 @@ class MediumSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    counte = serializers.SerializerMethodField()
+    computed_time = serializers.SerializerMethodField()
     #counter = serializers.SerializerMethodField()
     #wgt = serializers.SerializerMethodField()
-    computed_time = serializers.SerializerMethodField()
     #first_article = serializers.SerializerMethodField()
     #most = serializers.SerializerMethodField()
     class Meta:
