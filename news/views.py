@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EventSerializer
     queryset = models.Event.objects.all()
-    filter_fields = ('is_hidden',)
+    filter_fields = ('is_visible',)
 
     def get_queryset(self):
         time_range = self.request.GET.get('range', 'today')
@@ -64,7 +64,6 @@ class EventViewSet(viewsets.ModelViewSet):
                     FloatField()
                 )
             ).annotate(ordering=F('this_count')/F('all_count')).order_by('-ordering')
-
 
 
 class ArticleViewSet(viewsets.ModelViewSet):

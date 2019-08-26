@@ -13,10 +13,10 @@ class MediumAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['title', 'date', 'number_of_articles', 'is_hidden']
+    list_display = ['title', 'date', 'number_of_articles', 'is_visible']
     search_fields = ['title', 'summary']
-    list_filter = ['date', 'is_hidden']
-    list_editable = ('is_hidden',)
+    list_filter = ['date', 'is_visible']
+    list_editable = ('is_visible',)
 
     def get_queryset(self, request):
         return models.Event.objects.all().annotate(

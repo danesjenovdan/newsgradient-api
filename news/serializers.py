@@ -30,7 +30,7 @@ class EventSerializer(serializers.ModelSerializer):
             'date',
             'computed_time',
             'count',
-            'is_hidden',
+            'is_visible',
             'image',
             #'counter',
             #'first_article',
