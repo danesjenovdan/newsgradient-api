@@ -15,7 +15,7 @@ class EventViewSet(viewsets.ModelViewSet):
     filter_fields = ('is_visible',)
 
     def get_queryset(self):
-        time_range = self.request.GET.get('range', 'today')
+        time_range = self.request.GET.get('range', 'all')
         slant = self.request.GET.get('slant', 'all')
 
         # get all events and annotate field count of articles per event
