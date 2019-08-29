@@ -45,7 +45,10 @@ class EventSerializer(serializers.ModelSerializer):
         return obj.articles.earliest("datetime").datetime
 
     def get_image(self, obj):
-        return random.choice(obj.articles.all()).image
+        image = None
+        while not image:
+            image = random.choice(obj.articles.all()).image
+        return image
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)

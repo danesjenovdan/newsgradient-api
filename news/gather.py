@@ -20,6 +20,8 @@ class Refresher(object):
     def start(self):
         self.refresh_data()
         self.set_semtiment()
+        self.get_favicons()
+        self.get_og_tags()
 
     def refresh_data(self):
         q=QueryEvents(
