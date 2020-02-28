@@ -97,5 +97,5 @@ class ArticleSerializer(serializers.ModelSerializer):
             'og_image'
         ]
 
-    class get_sentiment_bucket(self, obj):
+    def get_sentiment_bucket(self, obj):
         return calculate_bucket(obj.sentiment)
