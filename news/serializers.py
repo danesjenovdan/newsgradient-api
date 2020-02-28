@@ -74,6 +74,11 @@ class EventSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     medium = MediumSerializer()
+    sentiment_bucket = serializers.SerializerMethodField()
+
+    def calculate_bucket(value):
+        return round(value + 1 * 5) / 2
+
     class Meta:
         model = models.Article
         fields =  [
@@ -83,6 +88,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             'image',
             'sentiment',
             'sentimentRNN',
+            'sentiment_bucket',
             'medium',
             'datetime',
             'url',
@@ -90,3 +96,6 @@ class ArticleSerializer(serializers.ModelSerializer):
             'og_description',
             'og_image'
         ]
+
+    class get_sentiment_bucket(self, obj):
+        return calculate_bucket(obj.sentiment)
