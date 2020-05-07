@@ -18,9 +18,9 @@ class Refresher(object):
         self.articles = list(models.Article.objects.values_list('uri', flat=True))
 
     def start(self):
-        self.refresh_data('BIH')
+        self.refresh_data('BOS')
         self.refresh_data('HR')
-        #self.refresh_data('RS')
+        self.refresh_data('SRP')
         #self.set_semtiment()
         self.get_favicons()
         self.get_og_tags()
@@ -29,10 +29,9 @@ class Refresher(object):
         q = QueryEventsIter(
             #sourceLocationUri=self.er.getLocationUri(country),
             locationUri=self.er.getLocationUri(country),
-            #dateStart=(datetime.today()-timedelta(days=30)),
-            #dateEnd=datetime.today()
+            dateStart=(datetime.today()-timedelta(days=1)),
+            dateEnd=datetime.today()
         )
-
         responses=[]
         try:
             for event in q.execQuery(self.er, sortBy = "date"):
@@ -41,10 +40,9 @@ class Refresher(object):
         except Exception as e:
             print(e)
 
-
         q = QueryArticlesIter(
-            sourceLocationUri=self.er.getLocationUri(country),
-            dateStart=(datetime.today()-timedelta(days=30)),
+            locationUri=self.er.getLocationUri(country),
+            dateStart=(datetime.today()-timedelta(days=1)),
             dateEnd=datetime.today(),
             eventFilter="skipArticlesWithoutEvent")
 
@@ -105,7 +103,7 @@ class Refresher(object):
             models.Article(
                 medium=medium,
                 event=event,
-                title=data['title'],#['eng'],
+                title=data['title'],
                 image=data['image'],
                 content=data['body'],
                 uri=data['uri'],
@@ -136,7 +134,7 @@ class Refresher(object):
             try:
                 icons = favicon.get('http://' + medium.uri)
             except:
-                pass
+                continue
             png_icons = list(filter(lambda x: x.format == 'png', icons))
             ico_icons = list(filter(lambda x: x.format == 'ico', icons))
             ss_png_icons = list(filter(lambda x: x.width == x.height and x.width > 0, png_icons))[:20]
@@ -153,7 +151,10 @@ class Refresher(object):
                     break
             if not found and ico_icons:
                 print(ico_icons)
-                ico_response = requests.get(ico_icons[0].url)
+                try:
+                    ico_response = requests.get(ico_icons[0].url)
+                except:
+                    continue
                 if ico_response.status_code == 200:
                     medium.favicon = ico_response.url
                     medium.save()

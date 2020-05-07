@@ -77,7 +77,10 @@ class ArticleSerializer(serializers.ModelSerializer):
     sentiment_bucket = serializers.SerializerMethodField()
 
     def calculate_bucket(self, value):
-        return round(round((value + 1) * 5) / 2)
+        if value:
+            return round(round((value + 1) * 5) / 2)
+        else:
+            return -1
 
     class Meta:
         model = models.Article
