@@ -38,8 +38,8 @@ class Refresher(object):
             for event in q.execQuery(self.er, sortBy = "date"):
                 responses.append(self.add_event(event))
                 print(responses.count(True), ' added events')
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
 
         q = QueryArticlesIter(
@@ -71,9 +71,11 @@ class Refresher(object):
         if data['uri'] not in self.events:
             #if 'eng' not in data['title'].keys() and 'eng' not in data['summary'].keys():
             #    return
+            t_key = list(data['title'].keys())[0]
+            s_key = list(data['summary'].keys())[0]
             event = models.Event(
-                title=data['title']['eng'],
-                summary=data['summary']['eng'],
+                title=data['title'][t_key],
+                summary=data['summary'][s_key],
                 date=datetime.strptime(data['eventDate'], '%Y-%m-%d').date(),
                 uri=data['uri'],
             )
