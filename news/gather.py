@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from eventregistry import *
+from eventregistry import RequestEventsInfo, EventRegistry, ArticleInfoFlags, ReturnInfo, QueryArticles, QueryEventsIter, QueryArticlesIter
 
 from news import models
 
@@ -18,52 +18,40 @@ class Refresher(object):
         self.articles = list(models.Article.objects.values_list('uri', flat=True))
 
     def start(self):
-        self.refresh_data()
-        self.set_semtiment()
+        self.refresh_data('BIH')
+        self.refresh_data('HR')
+        #self.refresh_data('RS')
+        #self.set_semtiment()
         self.get_favicons()
         self.get_og_tags()
 
-    def refresh_data(self):
-        q=QueryEvents(
-            categoryUri=self.er.getCategoryUri("politics"),
-            dateStart=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
-            dateEnd=datetime.today().strftime("%Y-%m-%d"),
-            sourceLocationUri=self.er.getLocationUri("USA"),
-            conceptUri=self.er.getConceptUri("USA"))
-        page = 1
-        pages = 100
-        while page <= pages:
-            q.setRequestedResult(RequestEventsInfo(page = page, count = 50,
-                returnInfo = ReturnInfo(articleInfo = ArticleInfoFlags(concepts = True, categories = True, image = True))))
-            page += 1
+    def refresh_data(self, country):
+        q = QueryEventsIter(
+            #sourceLocationUri=self.er.getLocationUri(country),
+            locationUri=self.er.getLocationUri(country),
+            #dateStart=(datetime.today()-timedelta(days=30)),
+            #dateEnd=datetime.today()
+        )
 
-            res = self.er.execQuery(q)
-            pages = res['events']['pages']
-            responses = []
-            for i in res['events']['results']:
-                responses.append(self.add_event(i))
-            print(responses.count(True), ' added events')
-            print('On page: ', page, ' of ', pages)
+        responses=[]
+        try:
+            for event in q.execQuery(self.er, sortBy = "date"):
+                responses.append(self.add_event(event))
+                print(responses.count(True), ' added events')
+        except:
+            pass
 
-        q = QueryArticles(
-            categoryUri=self.er.getCategoryUri("politics"),
-            dateStart=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
-            dateEnd=datetime.today().strftime("%Y-%m-%d"),
-            sourceLocationUri=self.er.getLocationUri("USA"),
-            conceptUri=self.er.getConceptUri("USA"))
-        page = 1
-        pages = 100
-        while page <= pages:
-            q.setRequestedResult(RequestArticlesInfo(page = page, count = 100,
-                returnInfo = ReturnInfo(articleInfo = ArticleInfoFlags(concepts = True, categories = True, image = True))))
-            page += 1
-            res = self.er.execQuery(q)
-            pages = res['articles']['pages']
-            responses = []
-            for i in res['articles']['results']:
-                responses.append(self.add_article(i))
+
+        q = QueryArticlesIter(
+            sourceLocationUri=self.er.getLocationUri(country),
+            dateStart=(datetime.today()-timedelta(days=30)),
+            dateEnd=datetime.today(),
+            eventFilter="skipArticlesWithoutEvent")
+
+        responses = []
+        for article in q.execQuery(self.er, sortBy = "date"):
+            responses.append(self.add_article(article))
             print(responses.count(True), ' added articles')
-            print('On page: ', page, ' of ', pages)
 
 
 
@@ -81,8 +69,8 @@ class Refresher(object):
 
     def add_event(self, data):
         if data['uri'] not in self.events:
-            if 'eng' not in data['title'].keys() and 'eng' not in data['summary'].keys():
-                return
+            #if 'eng' not in data['title'].keys() and 'eng' not in data['summary'].keys():
+            #    return
             event = models.Event(
                 title=data['title']['eng'],
                 summary=data['summary']['eng'],
@@ -109,8 +97,8 @@ class Refresher(object):
             except:
                 #print('event doesnt exist')
                 return False
-            if 'eng' !=  data['lang']:
-                return
+            #if 'eng' !=  data['lang']:
+            #    return
 
             models.Article(
                 medium=medium,
@@ -149,7 +137,7 @@ class Refresher(object):
                 pass
             png_icons = list(filter(lambda x: x.format == 'png', icons))
             ico_icons = list(filter(lambda x: x.format == 'ico', icons))
-            ss_png_icons = list(filter(lambda x: x.width == x.height and x.width > 0, png_icons))
+            ss_png_icons = list(filter(lambda x: x.width == x.height and x.width > 0, png_icons))[:20]
             found = False
             for img in ss_png_icons:
                 try:
