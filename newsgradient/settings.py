@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '%9(-uv2((djj8=z3wl=#3w=0395k+k(64y-ubio-ibh)bf23fj'
+SECRET_KEY = os.getenv('SECRET_KEY', 'asd')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -43,12 +43,13 @@ INSTALLED_APPS = [
     'django_crontab',
 
     'news',
+    'backoffice',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -80,10 +81,21 @@ WSGI_APPLICATION = 'newsgradient.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+# Uncomment code bellow to use postgres with docker
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
@@ -140,10 +152,26 @@ REST_FRAMEWORK = {
 
 ORDER_TRASHOLD = 5 # THRESHOLD
 
-CORS_ORIGIN_ALLOW_ALL = True
 
-ER_API_KEY = "bffa61a3-e09e-46de-bf9c-6966615bac71"
+ER_API_KEY = os.getenv('ER_API_KEY')
 
 CRONJOBS = [
     ('*/30 * * * *', 'news.cron.get_new_news')
 ]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://cache:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+
+CORS_ORIGIN_WHITELIST = [
+    f'{os.getenv("ORIGIN_DOMAIN")}',
+]
+
+LOGIN_URL = '/admin/login/'

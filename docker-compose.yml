@@ -1,0 +1,32 @@
+version: '3'
+services:
+  db:
+    image: "postgres:11.5-alpine"
+    ports:
+      - "127.0.0.1:65000:5432"
+
+  cache:
+    image: "redis:latest"
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  web:
+    build: .
+    environment:
+      COMPOSE_HTTP_TIMEOUT: 300
+    command: bash -c "gunicorn -c gunicorn.conf.py newsgradient.wsgi --access-logfile - --error-logfile - --log-level debug  --reload"
+    volumes:
+      - .:/code
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:20000:8000"
+    depends_on:
+      - db
+      - cache
+    links:
+      - db
+      - cache

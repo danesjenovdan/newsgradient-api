@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clear events cache</title>
+</head>
+<body>
+  <h1>Clear cache for events and articles</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Clear cache</button>
+  </form>
+
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</body>
+</html>

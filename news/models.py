@@ -1,13 +1,15 @@
 from django.db import models
 
 # Create your models here.
+from constants import Orientations
+
 
 class Medium(models.Model):
     ORIENTATIONS = (
-        ('left', 'far left'),
-        ('lib', 'liberal'),
-        ('con', 'conservative'),
-        ('right', 'far right'),
+        (Orientations.FAR_LEFT, 'Far left'),
+        (Orientations.LIBERAL, 'Liberal'),
+        (Orientations.CONSERVATIVE, 'Conservative'),
+        (Orientations.FAR_RIGHT, 'Far right'),
     )
     title = models.CharField(max_length=128)
     uri = models.CharField(max_length=128, db_index=True)
@@ -16,8 +18,7 @@ class Medium(models.Model):
         null=True,
         blank=True
     )
-    slant = models.CharField(
-        max_length=10,
+    slant = models.PositiveSmallIntegerField(
         choices=ORIENTATIONS,
         null=True,
         blank=True
@@ -29,23 +30,32 @@ class Medium(models.Model):
 
 
 class Event(models.Model):
+    class Meta:
+        ordering = ['-article_count']
+    uri = models.CharField(max_length=25, primary_key=True)
+    updated_at = models.DateTimeField(db_index=True, auto_now=True)
     title = models.CharField(max_length=512, default='')
     summary = models.TextField(default='')
-    uri = models.CharField(max_length=128, db_index=True)
-    date = models.DateField()
+    date = models.DateField(db_index=True)
     images = models.TextField(default='')
-    is_visible = models.BooleanField(default=False)
+    is_promoted = models.BooleanField(default=False, db_index=True)
+    article_count = models.PositiveIntegerField(db_index=True)
+    sentiment = models.FloatField(null=True, blank=True)
+    wgt = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.title
 
+    def __repr__(self):
+        return self.title
+
 
 class Article(models.Model):
+    uri = models.CharField(max_length=25, primary_key=True)
     title = models.CharField(max_length=512, default='')
     content = models.TextField(default='')
     url = models.URLField(max_length=512)
     datetime = models.DateTimeField()
-    uri = models.CharField(max_length=128, db_index=True)
     image = models.CharField(max_length=512, null=True, blank=True)
     medium = models.ForeignKey('Medium', related_name='articles', on_delete=models.CASCADE)
     event = models.ForeignKey('Event', related_name='articles', on_delete=models.CASCADE)

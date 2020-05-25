@@ -1,14 +1,12 @@
-from django.conf import settings
-
-from eventregistry import *
-
-from news import models
-
 from datetime import datetime, timedelta
 
 import favicon
-import requests
 import metadata_parser
+import requests
+from django.conf import settings
+from eventregistry import *
+
+from news import models
 
 
 class Refresher(object):
@@ -24,17 +22,19 @@ class Refresher(object):
         self.get_og_tags()
 
     def refresh_data(self):
-        q=QueryEvents(
+        q = QueryEvents(
             categoryUri=self.er.getCategoryUri("politics"),
-            dateStart=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
+            dateStart=(datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d"),
             dateEnd=datetime.today().strftime("%Y-%m-%d"),
             sourceLocationUri=self.er.getLocationUri("USA"),
             conceptUri=self.er.getConceptUri("USA"))
         page = 1
         pages = 100
         while page <= pages:
-            q.setRequestedResult(RequestEventsInfo(page = page, count = 50,
-                returnInfo = ReturnInfo(articleInfo = ArticleInfoFlags(concepts = True, categories = True, image = True))))
+            q.setRequestedResult(RequestEventsInfo(page=page, count=50,
+                                                   returnInfo=ReturnInfo(
+                                                       articleInfo=ArticleInfoFlags(concepts=True, categories=True,
+                                                                                    image=True))))
             page += 1
 
             res = self.er.execQuery(q)
@@ -47,15 +47,17 @@ class Refresher(object):
 
         q = QueryArticles(
             categoryUri=self.er.getCategoryUri("politics"),
-            dateStart=(datetime.today()-timedelta(days=1)).strftime("%Y-%m-%d"),
+            dateStart=(datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d"),
             dateEnd=datetime.today().strftime("%Y-%m-%d"),
             sourceLocationUri=self.er.getLocationUri("USA"),
             conceptUri=self.er.getConceptUri("USA"))
         page = 1
         pages = 100
         while page <= pages:
-            q.setRequestedResult(RequestArticlesInfo(page = page, count = 100,
-                returnInfo = ReturnInfo(articleInfo = ArticleInfoFlags(concepts = True, categories = True, image = True))))
+            q.setRequestedResult(RequestArticlesInfo(page=page, count=100,
+                                                     returnInfo=ReturnInfo(
+                                                         articleInfo=ArticleInfoFlags(concepts=True, categories=True,
+                                                                                      image=True))))
             page += 1
             res = self.er.execQuery(q)
             pages = res['articles']['pages']
@@ -64,8 +66,6 @@ class Refresher(object):
                 responses.append(self.add_article(i))
             print(responses.count(True), ' added articles')
             print('On page: ', page, ' of ', pages)
-
-
 
     def get_or_add_medium(self, data):
         medium = models.Medium.objects.filter(uri=data['source']['uri'])
@@ -90,7 +90,7 @@ class Refresher(object):
                 uri=data['uri'],
             )
             if 'images' in data.keys():
-                event.images=data['images']
+                event.images = data['images']
             event.save()
             self.events.append(data['uri'])
             return True
@@ -107,15 +107,15 @@ class Refresher(object):
             try:
                 event = models.Event.objects.get(uri=data['eventUri'])
             except:
-                #print('event doesnt exist')
+                # print('event doesnt exist')
                 return False
-            if 'eng' !=  data['lang']:
+            if 'eng' != data['lang']:
                 return
 
             models.Article(
                 medium=medium,
                 event=event,
-                title=data['title'],#['eng'],
+                title=data['title'],  # ['eng'],
                 image=data['image'],
                 content=data['body'],
                 uri=data['uri'],
@@ -168,24 +168,22 @@ class Refresher(object):
                     medium.favicon = ico_response.url
                     medium.save()
 
-
     def get_og_tags(self):
         articles = models.Article.objects.filter(og_title=None)
         all = articles.count()
-        i=0
+        i = 0
         for article in articles:
             print(article.url)
-            i+=1
+            i += 1
             try:
                 page = metadata_parser.MetadataParser(url=article.url)
             except:
                 continue
-            article.og_title = get_first_or_none(page.get_metadatas('title', strategy=['og',]))
-            article.og_description = get_first_or_none(page.get_metadatas('description', strategy=['og',]))
-            article.og_image = get_first_or_none(page.get_metadatas('image', strategy=['og',]))
+            article.og_title = get_first_or_none(page.get_metadatas('title', strategy=['og', ]))
+            article.og_description = get_first_or_none(page.get_metadatas('description', strategy=['og', ]))
+            article.og_image = get_first_or_none(page.get_metadatas('image', strategy=['og', ]))
             article.save()
             print(i, 'of', all)
-
 
 
 def get_first_or_none(item):
