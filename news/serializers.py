@@ -1,10 +1,9 @@
-from rest_framework import serializers
-
+import random
 from collections import Counter
 
-from news import models
+from rest_framework import serializers
 
-import random
+from news import models
 
 
 class MediumSerializer(serializers.ModelSerializer):
@@ -14,13 +13,13 @@ class MediumSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    count = serializers.SerializerMethodField()
-    computed_time = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
-    #counter = serializers.SerializerMethodField()
-    #wgt = serializers.SerializerMethodField()
-    #first_article = serializers.SerializerMethodField()
-    #most = serializers.SerializerMethodField()
+    # count = serializers.SerializerMethodField()
+    # computed_time = serializers.SerializerMethodField()
+
+    # counter = serializers.SerializerMethodField()
+    # wgt = serializers.SerializerMethodField()
+    # first_article = serializers.SerializerMethodField()
+    # most = serializers.SerializerMethodField()
     class Meta:
         model = models.Event
         fields = [
@@ -28,14 +27,13 @@ class EventSerializer(serializers.ModelSerializer):
             'title',
             'summary',
             'date',
-            'computed_time',
-            'count',
+            # 'computed_time',
+            # 'count',
             'is_visible',
-            'image',
-            #'counter',
-            #'first_article',
-            #'most',
-            #'wgt',
+            # 'counter',
+            # 'first_article',
+            # 'most',
+            # 'wgt',
         ]
 
     def get_count(self, obj):
@@ -43,12 +41,6 @@ class EventSerializer(serializers.ModelSerializer):
 
     def get_computed_time(self, obj):
         return obj.articles.earliest("datetime").datetime
-
-    def get_image(self, obj):
-        image = None
-        while not image:
-            image = random.choice(obj.articles.all()).image
-        return image
 
     def get_counter(self, obj):
         all_articles = obj.articles.exclude(medium__slant=None)
@@ -68,8 +60,7 @@ class EventSerializer(serializers.ModelSerializer):
         return obj.articles.exclude(medium__slant=None).earliest('datetime').datetime
 
     def get_wgt(self, obj):
-
-        return {'this_count': obj.this_count, 'all_count': obj.all_count, 'score': obj.this_count/obj.all_count}
+        return {'this_count': obj.this_count, 'all_count': obj.all_count, 'score': obj.this_count / obj.all_count}
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -81,7 +72,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Article
-        fields =  [
+        fields = [
             'id',
             'title',
             'content',

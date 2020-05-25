@@ -19,5 +19,5 @@ from django.conf.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('v1/', include('news.urls')),
+    path('v1/', include('api_versioning.urls_v1')),
 ]

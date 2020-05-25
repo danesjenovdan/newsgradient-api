@@ -3,6 +3,8 @@ from django.db.models import Count, Q, IntegerField
 from django.db.models.functions import Cast
 
 from news import models
+
+
 # Register your models here.
 
 class MediumAdmin(admin.ModelAdmin):
