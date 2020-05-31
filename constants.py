@@ -10,3 +10,8 @@ class Orientations:
     LIBERAL = 2
     CONSERVATIVE = 3
     FAR_RIGHT = 4
+
+
+class Languages:
+    CROATIAN = 'hrv'
+    SERBIAN = 'srp'
