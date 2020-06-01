@@ -1,14 +1,25 @@
-from datetime import datetime, timedelta
+import typing
+from datetime import datetime
+from datetime import timedelta
 
-from django.db.models import Count, Q, F, FloatField
+from django.db.models import Count
+from django.db.models import F
+from django.db.models import FloatField
+from django.db.models import Q
 from django.db.models.functions import Cast
 from rest_framework import viewsets
-from rest_framework.permissions import AllowAny, IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from constants import TimeRange
-from news import serializers, models
+from news import models
+from news import serializers
 # Create your views here.
-from news.services import get_most_popular_events
+from news.schemas import EventSchema
+from news.services import get_most_popular_events_with_articles
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -81,3 +92,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ArticleSerializer
     queryset = models.Article.objects.all().prefetch_related('medium')
     filter_fields = ('event',)
+
+
+class TopEventsView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        events: typing.List[typing.Dict] = get_most_popular_events_with_articles()
+        schema = EventSchema(many=True)
+        return Response(schema.dump(events))

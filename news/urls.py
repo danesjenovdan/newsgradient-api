@@ -9,4 +9,5 @@ router.register(r'articles', views.ArticleViewSet)
 
 urlpatterns = [
     url('^', include(router.urls)),
+    url('top-events/', views.TopEventsView.as_view()),
 ]
