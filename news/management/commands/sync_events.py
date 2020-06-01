@@ -82,10 +82,11 @@ class Command(BaseCommand):
             datetime = article.get('dateTime')
             image = article.get('image')
             sentiment = article.get('sentiment')
-            # medium_url = article.get('source', {}).get('uri', '')
+            medium_url = article.get('source', {}).get('uri', '')
 
             existing_article = Article.objects.filter(uri=uri).first()
-            if not existing_article:
+            medium_id = mediums.get(medium_url, None)
+            if not existing_article and medium_id is not None:
                 Article.objects.create(
                     uri=uri,
                     title=title,
@@ -95,8 +96,7 @@ class Command(BaseCommand):
                     image=image,
                     event_id=event_uri,
                     sentiment=sentiment,
-                    medium_id=mediums.get('test.ba')
-                    # medium=mediums.get(medium_url)
+                    medium_id=medium_id
                 )
 
     @staticmethod

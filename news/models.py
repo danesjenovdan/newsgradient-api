@@ -30,7 +30,7 @@ class Medium(models.Model):
 
 
 class Event(models.Model):
-    uri = models.CharField(max_length=128, primary_key=True)
+    uri = models.CharField(max_length=25, primary_key=True)
     updated_at = models.DateTimeField(db_index=True, auto_now=True)
     title = models.CharField(max_length=512, default='')
     summary = models.TextField(default='')
@@ -49,7 +49,7 @@ class Event(models.Model):
 
 
 class Article(models.Model):
-    uri = models.CharField(max_length=128, primary_key=True)
+    uri = models.CharField(max_length=25, primary_key=True)
     title = models.CharField(max_length=512, default='')
     content = models.TextField(default='')
     url = models.URLField(max_length=512)
