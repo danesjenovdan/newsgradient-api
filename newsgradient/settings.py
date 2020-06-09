@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_crontab',
 
     'news',
+    'backoffice',
 ]
 
 MIDDLEWARE = [
@@ -172,3 +173,5 @@ CACHES = {
 CORS_ORIGIN_WHITELIST = [
     f'{os.getenv("ORIGIN_DOMAIN")}',
 ]
+
+LOGIN_URL = '/admin/login/'

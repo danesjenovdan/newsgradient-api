@@ -10,6 +10,7 @@ class MediumSchema(Schema):
     title = fields.String(dump_only=True)
     uri = fields.String(dump_only=True)
     slant = fields.String(dump_only=True)
+    favicon = fields.String(dump_only=True)
 
 
 class ArticleSchema(Schema):
