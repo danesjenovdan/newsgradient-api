@@ -72,3 +72,4 @@ staticfiles/
 *.prod.py
 
 .env
+local_settings.py
