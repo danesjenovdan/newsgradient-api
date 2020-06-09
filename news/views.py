@@ -2,6 +2,7 @@ import typing
 from datetime import datetime
 from datetime import timedelta
 
+from django.core.cache import cache
 from django.db.models import Count
 from django.db.models import F
 from django.db.models import FloatField
@@ -14,11 +15,16 @@ from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.views import SuperAPIView
+from constants import CacheKeys
 from constants import TimeRange
 from news import models
 from news import serializers
-# Create your views here.
+from news.schemas import EventArticlesSchema
 from news.schemas import EventSchema
+from news.schemas import TopEventQPSchema
+from news.services import get_event
+from news.services import get_event_articles
 from news.services import get_most_popular_events_with_articles
 
 
@@ -37,9 +43,6 @@ class EventViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         time_range = self.request.GET.get('range', 'all')
         slant = self.request.GET.get('slant', 'all')
-
-        if self.request.query_params.get('popular') is not None and self.action == 'list':
-            return get_most_popular_events()
 
         # get all events and annotate field count of articles per event
         events = models.Event.objects.all().annotate(
@@ -88,16 +91,46 @@ class EventViewSet(viewsets.ModelViewSet):
             ).annotate(ordering=F('this_count') / F('all_count')).order_by('-ordering')
 
 
-class ArticleViewSet(viewsets.ModelViewSet):
-    serializer_class = serializers.ArticleSerializer
-    queryset = models.Article.objects.all().prefetch_related('medium')
-    filter_fields = ('event',)
-
-
-class TopEventsView(APIView):
+class ArticleView(APIView):
     permission_classes = (AllowAny,)
 
+    def get(self, request, event_id):
+        cache_key = f'{CacheKeys.EVENT_ARTICLES}::{event_id}'
+        cached_value = cache.get(cache_key)
+        if not cached_value:
+            service_response: typing.List[typing.Dict] = get_event_articles(event_id)
+            schema = EventArticlesSchema()
+            data = schema.dump(service_response)
+            cache.set(cache_key, data)
+            return Response(data)
+        return Response(cached_value)
+
+
+class TopEventsView(SuperAPIView):
+    permission_classes = (AllowAny,)
+    qp_schema = TopEventQPSchema
+
     def get(self, request):
-        events: typing.List[typing.Dict] = get_most_popular_events_with_articles()
-        schema = EventSchema(many=True)
-        return Response(schema.dump(events))
+        time_range = self.cleaned_qp.get('timerange')
+        slant = self.cleaned_qp.get('slant')
+
+        cache_key = f'{CacheKeys.TOP_EVENTS}::{time_range}::{slant}'
+        cached_value = cache.get(cache_key)
+        if not cached_value:
+            events: typing.List[typing.Dict] = get_most_popular_events_with_articles(time_range, slant)
+            schema = EventSchema(many=True)
+            data = schema.dump(events)
+            cache.set(cache_key, data)
+            return Response(data)
+        return Response(cached_value)
+
+
+class EventDetailView(APIView):
+    permission_classes = (AllowAny,)
+    qp_schema = TopEventQPSchema
+
+    def get(self, request, event_id):
+        event: typing.Dict = get_event(event_id)
+        schema = EventSchema()
+        data = schema.dump(event)
+        return Response(data)

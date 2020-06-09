@@ -15,7 +15,7 @@ class MediumAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ['title', 'date', 'number_of_articles', 'is_promoted']
+    list_display = ['title', 'date', 'number_of_articles', 'article_count', 'is_promoted']
     search_fields = ['title', 'summary']
     list_filter = ['date', 'is_promoted']
     list_editable = ('is_promoted',)

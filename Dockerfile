@@ -8,3 +8,4 @@ ADD . /code/
 RUN mkdir -p /code/logs
 
 RUN pip install -r requirements.txt
+EXPOSE 8000

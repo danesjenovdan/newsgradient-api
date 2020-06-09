@@ -62,7 +62,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Created event with uri {new_event.uri}')
 
         date_filter = datetime.datetime.utcnow() - datetime.timedelta(days=14)
-        top_five_events = Event.objects.filter(date__gte=date_filter).order_by('-article_count')[:5]
+        top_five_events = Event.objects.filter(date__gte=date_filter).order_by('-article_count')
         self.stdout.write(f'Top five events are: {top_five_events}')
         for event in top_five_events:
             self.stdout.write(f'Started fetching articles for event {event.uri}')

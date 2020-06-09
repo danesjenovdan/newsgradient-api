@@ -30,6 +30,8 @@ class Medium(models.Model):
 
 
 class Event(models.Model):
+    class Meta:
+        ordering = ['-article_count']
     uri = models.CharField(max_length=25, primary_key=True)
     updated_at = models.DateTimeField(db_index=True, auto_now=True)
     title = models.CharField(max_length=512, default='')
