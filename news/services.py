@@ -1,6 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 
+from django.db.models import Count
 from rest_framework.exceptions import NotFound
 
 from constants import Orientations
@@ -13,9 +14,12 @@ from news.models import Medium
 def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NEUTRAL):
     mediums = {medium.get('id'): medium for medium in Medium.objects.all().values()}
 
-    promoted_events = Event.objects.values('uri', 'title', 'summary', 'date', 'article_count') \
+    promoted_events = Event.objects \
+        .select_related('articles') \
+        .annotate(all_articles_count=Count('articles')) \
+        .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
         .filter(is_promoted=True) \
-        .order_by('-article_count')
+        .order_by('-all_articles_count')
     promoted_events_count = len(promoted_events)
 
     events = []
@@ -29,8 +33,10 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
             events = events.filter(date__gte=datetime.today() - timedelta(days=7))
         elif time_range == TimeRange.LAST_MONTH.value:
             events = events.filter(date__gte=datetime.today() - timedelta(days=30))
-        events = events.order_by('-article_count') \
-                     .values('uri', 'title', 'summary', 'date', 'article_count')[:5 - promoted_events_count]
+        events = events.select_related('articles') \
+                     .annotate(all_articles_count=Count('articles')) \
+                     .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
+                     .order_by('-all_articles_count')[:5 - promoted_events_count]
     elif promoted_events_count > 5:
         promoted_events = promoted_events[:5]
 
