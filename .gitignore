@@ -70,3 +70,5 @@ staticfiles/
 *.djcache
 
 *.prod.py
+
+.env
