@@ -32,7 +32,9 @@ class EventSchema(Schema):
     uri = fields.String(dump_only=True, data_key='id')
     title = fields.String(dump_only=True)
     summary = fields.String(dump_only=True)
+    image = fields.String(dump_only=True)
     date = fields.DateTime(dump_only=True)
+    first_publish = fields.String(dump_only=True, data_key='firstPublish')
     articles = fields.Nested(ArticleSchema, many=True)
     all_articles_count = fields.Int(dump_only=True, data_key='articleCount')
 

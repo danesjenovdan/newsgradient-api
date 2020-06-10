@@ -18,7 +18,7 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
         .select_related('articles') \
         .annotate(all_articles_count=Count('articles')) \
         .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
-        .filter(is_promoted=True) \
+        .filter(is_promoted=True, all_articles_count__gt=1) \
         .order_by('-all_articles_count')
     promoted_events_count = len(promoted_events)
 
@@ -36,6 +36,7 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
         events = events.select_related('articles') \
                      .annotate(all_articles_count=Count('articles')) \
                      .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
+                     .filter(all_articles_count__gt=1) \
                      .order_by('-all_articles_count')[:5 - promoted_events_count]
     elif promoted_events_count > 5:
         promoted_events = promoted_events[:5]
@@ -44,11 +45,21 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
     for event in final_events:
         articles = Article.objects.select_related('medium') \
                        .filter(event_id=event.get('uri'), medium__slant=slant) \
+                       .order_by('datetime') \
                        .values('uri', 'url', 'title', 'content', 'image', 'datetime', 'medium_id')[:3]
-
         for article in articles:
             article['medium'] = mediums.get(article.get('medium_id'))
+            event['image'] = article.get('image') if article.get('image') else None
         event['articles'] = articles
+        if len(articles):
+            d = datetime.utcnow() - articles[0].get('datetime').replace(tzinfo=None)
+            hours = int(d.total_seconds() // 3600)
+            if hours <= 24:
+                event['first_publish'] = f'{hours} hours ago'
+            elif hours > 24 and hours <= 48:
+                event['first_publish'] = f'yesterday'
+            elif hours > 48:
+                event['first_publish'] = f'More than 2 days ago'
 
     return final_events
 

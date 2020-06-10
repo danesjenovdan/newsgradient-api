@@ -116,13 +116,18 @@ class TopEventsView(SuperAPIView):
 
         cache_key = f'{CacheKeys.TOP_EVENTS}::{time_range}::{slant}'
         cached_value = cache.get(cache_key)
-        if not cached_value:
-            events: typing.List[typing.Dict] = get_most_popular_events_with_articles(time_range, slant)
-            schema = EventSchema(many=True)
-            data = schema.dump(events)
-            cache.set(cache_key, data)
-            return Response(data)
-        return Response(cached_value)
+        # if not cached_value:
+        #     events: typing.List[typing.Dict] = get_most_popular_events_with_articles(time_range, slant)
+        #     schema = EventSchema(many=True)
+        #     data = schema.dump(events)
+        #     cache.set(cache_key, data)
+        #     return Response(data)
+        # return Response(cached_value)
+        events: typing.List[typing.Dict] = get_most_popular_events_with_articles(time_range, slant)
+        schema = EventSchema(many=True)
+        data = schema.dump(events)
+        cache.set(cache_key, data)
+        return Response(data)
 
 
 class EventDetailView(APIView):

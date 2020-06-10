@@ -4,6 +4,7 @@ import os
 import favicon
 import requests
 from django.core.management import BaseCommand
+from django.core.management import call_command
 from eventregistry import EventRegistry
 from eventregistry import QueryEventArticlesIter
 from eventregistry import QueryEventsIter
@@ -19,7 +20,7 @@ from news.models import Medium
 class Command(BaseCommand):
     def handle(self, *args, **options):
         self.handle_events()
-        self.get_medium_favicons()
+        call_command('clear_cache')
 
     def handle_events(self):
         key = os.getenv('ER_API_KEY')
@@ -50,6 +51,7 @@ class Command(BaseCommand):
             article_count = event.get('totalArticleCount')
             sentiment = event.get('sentiment')
             wgt = event.get('wgt')
+            images = event.get('images', [])
 
             existing_event = Event.objects.filter(uri=uri).first()
             if existing_event:
@@ -64,6 +66,8 @@ class Command(BaseCommand):
                 new_event.sentiment = sentiment
                 new_event.date = datetime.datetime.strptime(event_date, '%Y-%m-%d')
                 new_event.uri = uri
+                if len(images):
+                    new_event.images = images[0]
                 new_event.save()
                 self.stdout.write(f'Created event with uri {new_event.uri}')
 

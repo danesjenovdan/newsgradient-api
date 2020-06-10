@@ -13,6 +13,8 @@ class Command(BaseCommand):
                 icons = favicon.get('http://' + medium.uri)
             except Exception:
                 continue
+            if not icons:
+                continue
             png_icons = list(filter(lambda x: x.format == 'png', icons))
             ico_icons = list(filter(lambda x: x.format == 'ico', icons))
             ss_png_icons = list(filter(lambda x: x.width == x.height and x.width > 0, png_icons))
