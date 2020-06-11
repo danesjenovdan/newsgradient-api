@@ -7,10 +7,13 @@
 <body>
   <h1>Clear cache for events and articles</h1>
 
-  <form method="post">
-    {% csrf_token %}
-    <button type="submit">Clear cache</button>
-  </form>
+  {% for command in commands %}
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="command_name" value="{{ command }}">
+      <button type="submit">{{ command }}</button>
+    </form>
+  {% endfor %}
 
   {% if messages %}
     <ul class="messages">

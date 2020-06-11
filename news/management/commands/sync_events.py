@@ -90,7 +90,7 @@ class Command(BaseCommand):
             title = article.get('title')
             content = article.get('body')
             datetime = article.get('dateTime')
-            image = article.get('image')
+            image = article.get('image', '').replace('http://', 'https://')
             sentiment = article.get('sentiment')
             medium_url = article.get('source', {}).get('uri', '')
 
