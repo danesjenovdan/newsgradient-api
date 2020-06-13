@@ -3,6 +3,7 @@ import os
 
 import favicon
 import requests
+from django.core.cache import cache
 from django.core.management import BaseCommand
 from django.core.management import call_command
 from eventregistry import EventRegistry
@@ -19,12 +20,19 @@ from news.models import Medium
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        self.handle_events()
-        call_command('clear_cache')
+        if cache.get(constants.EVENT_FETCH_KEY) == constants.CommandStatus.RUNNING.value:
+            return
+        try:
+            cache.set(constants.EVENT_FETCH_KEY, constants.CommandStatus.RUNNING.value)
+            self.handle_events()
+            call_command('clear_cache')
+        except Exception:
+            pass
+        cache.set(constants.EVENT_FETCH_KEY, constants.CommandStatus.RUNNING.IDLE)
 
     def handle_events(self):
         key = os.getenv('ER_API_KEY')
-        locationUris = [
+        location_uris = [
             'http://en.wikipedia.org/wiki/Bosnia_and_Herzegovina',
             'http://en.wikipedia.org/wiki/Croatia',
             'http://en.wikipedia.org/wiki/Serbia_and_montenegro',
@@ -33,7 +41,7 @@ class Command(BaseCommand):
 
         er = EventRegistry(apiKey=key)
 
-        q = QueryEventsIter(locationUri=QueryItems.OR(locationUris),
+        q = QueryEventsIter(locationUri=QueryItems.OR(location_uris),
                             dateStart=datetime.datetime.now() - datetime.timedelta(days=2),
                             lang=QueryItems.OR(['hrv', 'srp']))
         q.setRequestedResult(RequestEventsInfo(sortBy='size'))
@@ -71,7 +79,7 @@ class Command(BaseCommand):
                 new_event.save()
                 self.stdout.write(f'Created event with uri {new_event.uri}')
 
-        date_filter = datetime.datetime.utcnow() - datetime.timedelta(days=14)
+        date_filter = datetime.datetime.utcnow() - datetime.timedelta(days=2)
         top_five_events = Event.objects.filter(date__gte=date_filter).order_by('-article_count')
         self.stdout.write(f'Top five events are: {top_five_events}')
         for event in top_five_events:

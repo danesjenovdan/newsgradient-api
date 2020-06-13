@@ -1,9 +1,10 @@
+from threading import Thread
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 from django.shortcuts import redirect
 from django.shortcuts import render
-
 # Create your views here.
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -33,6 +34,9 @@ class BackofficeView(View):
         if value not in COMMANDS:
             messages.add_message(request, messages.WARNING, 'Wrong data key')
             return redirect(reverse('backoffice.clear_cache'))
-        call_command(value)
+
+        t = Thread(name=f'Command Thread - {value}', target=call_command, args=(value,))
+        t.setDaemon(True)
+        t.start()
         messages.add_message(request, messages.INFO, f'{value} command run!')
         return redirect(reverse('backoffice.clear_cache'))

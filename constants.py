@@ -25,3 +25,11 @@ class CacheKeys:
     EVENTS = 'events'
     TOP_EVENTS = 'top_events'
     EVENT_ARTICLES = 'event-articles'
+
+
+EVENT_FETCH_KEY = 'sync_events_command'
+
+
+class CommandStatus(Enum):
+    IDLE = '0'
+    RUNNING = '1'
