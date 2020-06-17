@@ -1,5 +1,6 @@
 import datetime
 import os
+from threading import Thread
 
 import favicon
 import requests
@@ -79,10 +80,10 @@ class Command(BaseCommand):
                 new_event.save()
                 self.stdout.write(f'Created event with uri {new_event.uri}')
 
-        date_filter = datetime.datetime.utcnow() - datetime.timedelta(days=2)
-        top_five_events = Event.objects.filter(date__gte=date_filter).order_by('-article_count')
-        self.stdout.write(f'Top five events are: {top_five_events}')
-        for event in top_five_events:
+        date_filter = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+        events = Event.objects.filter(date__gte=date_filter).order_by('-article_count')
+        self.stdout.write(f'Top five events are: {events}')
+        for event in events:
             self.stdout.write(f'Started fetching articles for event {event.uri}')
             Command.handle_articles(er, event.uri, mediums_dict)
             self.stdout.write(f'Finished fetching articles for event {event.uri}')
