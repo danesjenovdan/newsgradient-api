@@ -16,6 +16,12 @@ class Orientations(Enum):
     FAR_RIGHT = 5
 
 
+class Reliability(Enum):
+    FACT_REPORTING = 'fact_reporting'
+    OPINION_PERSUASION = 'opinion_persuasion'
+    PROPAGANDA = 'propaganda'
+
+
 class Languages:
     CROATIAN = 'hrv'
     SERBIAN = 'srp'

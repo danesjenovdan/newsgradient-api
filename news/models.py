@@ -2,12 +2,14 @@ from django.db import models
 
 # Create your models here.
 from constants import Orientations
+from constants import Reliability
 
 
 class Medium(models.Model):
     ORIENTATIONS = (
         (Orientations.FAR_LEFT, 'Far left'),
         (Orientations.LIBERAL, 'Liberal'),
+        (Orientations.NEUTRAL, 'Neutral'),
         (Orientations.CONSERVATIVE, 'Conservative'),
         (Orientations.FAR_RIGHT, 'Far right'),
     )
@@ -24,14 +26,25 @@ class Medium(models.Model):
         blank=True
     )
     is_embeddable = models.BooleanField(default=True)
+    reliability = models.PositiveSmallIntegerField()
 
     def __str__(self):
         return self.title
+
+    @property
+    def reliability_group(self):
+        if self.reliability >= 33:
+            return Reliability.FACT_REPORTING
+        elif 17 <= self.reliability < 33:
+            return Reliability.OPINION_PERSUASION
+        else:
+            return Reliability.PROPAGANDA
 
 
 class Event(models.Model):
     class Meta:
         ordering = ['-article_count']
+
     uri = models.CharField(max_length=25, primary_key=True)
     updated_at = models.DateTimeField(db_index=True, auto_now=True)
     title = models.CharField(max_length=512, default='')

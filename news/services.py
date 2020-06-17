@@ -45,7 +45,7 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
     for event in final_events:
         articles = Article.objects.select_related('medium') \
                        .filter(event_id=event.get('uri'), medium__slant=slant) \
-                       .order_by('datetime') \
+                       .order_by('-medium__reliability') \
                        .values('uri', 'url', 'title', 'content', 'image', 'datetime', 'medium_id')[:3]
         for article in articles:
             article['medium'] = mediums.get(article.get('medium_id'))
@@ -56,7 +56,7 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
             hours = int(d.total_seconds() // 3600)
             if hours <= 24:
                 event['first_publish'] = f'{hours} hours ago'
-            elif hours > 24 and hours <= 48:
+            elif 24 < hours <= 48:
                 event['first_publish'] = f'yesterday'
             elif hours > 48:
                 event['first_publish'] = f'More than 2 days ago'
@@ -88,3 +88,16 @@ def get_event(event_uri):
             .get(uri=event_uri)
     except Event.DoesNotExist:
         raise NotFound
+
+
+def determine_slant_from_bias(bias: float) -> Orientations:
+    if bias <= -19:
+        return Orientations.FAR_LEFT
+    elif -18 <= bias <= -7:
+        return Orientations.LIBERAL
+    elif -6 <= bias <= 6:
+        return Orientations.NEUTRAL
+    elif 7 <= bias <= 18:
+        return Orientations.CONSERVATIVE
+    else:
+        return Orientations.FAR_RIGHT
