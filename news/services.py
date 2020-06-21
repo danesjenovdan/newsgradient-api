@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.db.models import Count
+from django.db.models import Q
 from rest_framework.exceptions import NotFound
 
 from constants import Orientations
@@ -16,7 +17,7 @@ def get_most_popular_events_with_articles(slant: int = Orientations.NEUTRAL):
         .select_related('articles') \
         .annotate(all_articles_count=Count('articles')) \
         .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
-        .filter(is_promoted=True, all_articles_count__gt=1) \
+        .filter(is_promoted=True) \
         .order_by('-all_articles_count')
 
     final_events = list(promoted_events)
@@ -24,11 +25,12 @@ def get_most_popular_events_with_articles(slant: int = Orientations.NEUTRAL):
         articles = Article.objects.select_related('medium') \
                        .filter(event_id=event.get('uri'), medium__slant=slant) \
                        .order_by('-medium__reliability') \
-                       .values('uri', 'url', 'title', 'content', 'image', 'datetime', 'medium_id')[:3]
+            .values('uri', 'url', 'title', 'content', 'image', 'datetime', 'medium_id')
         for article in articles:
             article['medium'] = mediums.get(article.get('medium_id'))
             event['image'] = article.get('image') if article.get('image') else None
-        event['articles'] = articles
+        event['articles'] = articles[:3]
+        event['all_articles_count'] = articles.count()
         if len(articles):
             d = datetime.utcnow() - articles[0].get('datetime').replace(tzinfo=None)
             hours = int(d.total_seconds() // 3600)

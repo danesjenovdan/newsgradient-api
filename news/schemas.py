@@ -40,10 +40,10 @@ class EventSchema(Schema):
 
 
 class TopEventQPSchema(Schema):
-    timerange = fields.String(default=TimeRange.LAST_MONTH,
-                              load_only=True,
-                              required=False,
-                              validate=validate.OneOf([t.value for t in TimeRange]))
+    # timerange = fields.String(default=TimeRange.LAST_MONTH,
+    #                           load_only=True,
+    #                           required=False,
+    #                           validate=validate.OneOf([t.value for t in TimeRange]))
     slant = fields.Int(default=Orientations.NEUTRAL,
                        load_only=True,
                        required=False,

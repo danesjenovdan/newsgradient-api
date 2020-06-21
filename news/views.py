@@ -111,10 +111,10 @@ class TopEventsView(SuperAPIView):
     qp_schema = TopEventQPSchema
 
     def get(self, request):
-        time_range = self.cleaned_qp.get('timerange')
+        # time_range = self.cleaned_qp.get('timerange')
         slant = self.cleaned_qp.get('slant')
 
-        cache_key = f'{CacheKeys.TOP_EVENTS}::{time_range}::{slant}'
+        cache_key = f'{CacheKeys.TOP_EVENTS}::{slant}'
         cached_value = cache.get(cache_key)
         if not cached_value:
             events: typing.List[typing.Dict] = get_most_popular_events_with_articles(slant)
@@ -123,10 +123,10 @@ class TopEventsView(SuperAPIView):
             cache.set(cache_key, data)
             return Response(data)
         return Response(cached_value)
+
         # events: typing.List[typing.Dict] = get_most_popular_events_with_articles(slant)
         # schema = EventSchema(many=True)
         # data = schema.dump(events)
-        # cache.set(cache_key, data)
         # return Response(data)
 
 
