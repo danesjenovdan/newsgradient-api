@@ -1,17 +1,15 @@
 from datetime import datetime
-from datetime import timedelta
 
 from django.db.models import Count
 from rest_framework.exceptions import NotFound
 
 from constants import Orientations
-from constants import TimeRange
 from news.models import Article
 from news.models import Event
 from news.models import Medium
 
 
-def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NEUTRAL):
+def get_most_popular_events_with_articles(slant: int = Orientations.NEUTRAL):
     mediums = {medium.get('id'): medium for medium in Medium.objects.all().values()}
 
     promoted_events = Event.objects \
@@ -20,28 +18,8 @@ def get_most_popular_events_with_articles(time_range=None, slant=Orientations.NE
         .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
         .filter(is_promoted=True, all_articles_count__gt=1) \
         .order_by('-all_articles_count')
-    promoted_events_count = len(promoted_events)
 
-    events = []
-    if promoted_events_count < 5:
-        events = Event.objects.all()
-        if time_range == TimeRange.TODAY.value:
-            events = events.filter(date=datetime.today())
-        elif time_range == TimeRange.YESTERDAY.value:
-            events = events.filter(date=datetime.today() - timedelta(days=1))
-        elif time_range == TimeRange.LAST_WEEK.value:
-            events = events.filter(date__gte=datetime.today() - timedelta(days=7))
-        elif time_range == TimeRange.LAST_MONTH.value:
-            events = events.filter(date__gte=datetime.today() - timedelta(days=30))
-        events = events.select_related('articles') \
-                     .annotate(all_articles_count=Count('articles')) \
-                     .values('uri', 'title', 'summary', 'date', 'all_articles_count') \
-                     .filter(all_articles_count__gt=1) \
-                     .order_by('-all_articles_count')[:5 - promoted_events_count]
-    elif promoted_events_count > 5:
-        promoted_events = promoted_events[:5]
-
-    final_events = list(promoted_events) + list(events)
+    final_events = list(promoted_events)
     for event in final_events:
         articles = Article.objects.select_related('medium') \
                        .filter(event_id=event.get('uri'), medium__slant=slant) \
