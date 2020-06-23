@@ -7,11 +7,9 @@ from constants import Reliability
 
 class Medium(models.Model):
     ORIENTATIONS = (
-        (Orientations.FAR_LEFT, 'Far left'),
-        (Orientations.LIBERAL, 'Liberal'),
+        (Orientations.LEFT, 'Left'),
         (Orientations.NEUTRAL, 'Neutral'),
-        (Orientations.CONSERVATIVE, 'Conservative'),
-        (Orientations.FAR_RIGHT, 'Far right'),
+        (Orientations.RIGHT, 'Right'),
     )
     title = models.CharField(max_length=128)
     uri = models.CharField(max_length=128, db_index=True)

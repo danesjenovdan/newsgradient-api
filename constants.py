@@ -9,11 +9,9 @@ class TimeRange(Enum):
 
 
 class Orientations(Enum):
-    FAR_LEFT = 1
-    LIBERAL = 2
-    NEUTRAL = 3
-    CONSERVATIVE = 4
-    FAR_RIGHT = 5
+    LEFT = 1
+    NEUTRAL = 2
+    RIGHT = 3
 
 
 class Reliability(Enum):

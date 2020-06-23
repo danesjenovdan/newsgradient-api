@@ -63,7 +63,7 @@ def get_event_articles(event_uri):
 
 def get_event(event_uri):
     try:
-        return Event.objects.defer('updated_at', 'is_promoted', 'sentimment', 'wgt') \
+        return Event.objects.defer('updated_at', 'is_promoted', 'sentiment', 'wgt') \
             .values() \
             .get(uri=event_uri)
     except Event.DoesNotExist:
@@ -71,13 +71,9 @@ def get_event(event_uri):
 
 
 def determine_slant_from_bias(bias: float) -> Orientations:
-    if bias <= -19:
-        return Orientations.FAR_LEFT
-    elif -18 <= bias <= -7:
-        return Orientations.LIBERAL
-    elif -6 <= bias <= 6:
+    if bias <= -4:
+        return Orientations.LEFT
+    elif -4 <= bias <= 4:
         return Orientations.NEUTRAL
-    elif 7 <= bias <= 18:
-        return Orientations.CONSERVATIVE
     else:
-        return Orientations.FAR_RIGHT
+        return Orientations.RIGHT
