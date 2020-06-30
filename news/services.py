@@ -34,12 +34,28 @@ def get_most_popular_events_with_articles(slant: int = Orientations.NEUTRAL):
         if len(articles):
             d = datetime.utcnow() - articles[0].get('datetime').replace(tzinfo=None)
             hours = int(d.total_seconds() // 3600)
-            if hours <= 24:
-                event['first_publish'] = f'{hours} hours ago'
+            if hours <= 1:
+                event['first_publish'] = f'Prije sat vremena'
+            elif 1 < hours <= 2:
+                event['first_publish'] = f'Prije dva sata'
+            elif 2 < hours <= 3:
+                event['first_publish'] = f'Prije tri sata'
+            elif 3 < hours <= 5:
+                event['first_publish'] = f'Prije pet sati'
+            elif 5 < hours <= 24:
+                event['first_publish'] = f'Danas'
             elif 24 < hours <= 48:
-                event['first_publish'] = f'yesterday'
-            elif hours > 48:
-                event['first_publish'] = f'More than 2 days ago'
+                event['first_publish'] = f'Jučer'
+            elif 48 < hours <= 72:
+                event['first_publish'] = f'Prije dva dana'
+            elif 72 < hours <= 96:
+                event['first_publish'] = f'Prije tri dana'
+            elif 96 < hours <= 120:
+                event['first_publish'] = f'Prije četiri dana'
+            elif 120 < hours <= 144:
+                event['first_publish'] = f'Prije pet dana'
+            elif hours > 144:
+                event['first_publish'] = f'Prije više od pet dana'
 
     return final_events
 

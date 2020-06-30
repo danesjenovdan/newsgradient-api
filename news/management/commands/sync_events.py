@@ -1,6 +1,5 @@
 import datetime
 import os
-from threading import Thread
 
 import favicon
 import requests
@@ -33,18 +32,19 @@ class Command(BaseCommand):
 
     def handle_events(self):
         key = os.getenv('ER_API_KEY')
-        location_uris = [
-            'http://en.wikipedia.org/wiki/Bosnia_and_Herzegovina',
-            'http://en.wikipedia.org/wiki/Croatia',
-            'http://en.wikipedia.org/wiki/Serbia_and_montenegro',
-        ]
+        # location_uris = [
+        #     'http://en.wikipedia.org/wiki/Bosnia_and_Herzegovina',
+        #     'http://en.wikipedia.org/wiki/Croatia',
+        #     'http://en.wikipedia.org/wiki/Serbia_and_montenegro',
+        # ]
         mediums_dict = Command.get_mediums()
 
         er = EventRegistry(apiKey=key)
 
-        q = QueryEventsIter(locationUri=QueryItems.OR(location_uris),
-                            dateStart=datetime.datetime.now() - datetime.timedelta(days=2),
-                            lang=QueryItems.OR(['hrv', 'srp']))
+        q = QueryEventsIter(
+            dateStart=datetime.datetime.now() - datetime.timedelta(days=2),
+            lang=QueryItems.OR(['hrv', 'srp'])
+        )
         q.setRequestedResult(RequestEventsInfo(sortBy='size'))
 
         self.stdout.write('Started fetching Events')
