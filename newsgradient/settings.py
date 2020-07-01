@@ -171,6 +171,6 @@ CORS_ORIGIN_WHITELIST = [
 LOGIN_URL = '/admin/login/'
 
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     print('Local settings not found')

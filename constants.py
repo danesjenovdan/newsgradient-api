@@ -32,6 +32,7 @@ class CacheKeys:
 
 
 EVENT_FETCH_KEY = 'sync_events_command'
+ALL_ARTICLES_FETCH = 'all_articles_fetch'
 
 
 class CommandStatus(Enum):

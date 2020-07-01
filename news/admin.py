@@ -1,5 +1,7 @@
 from django.contrib import admin
-from django.db.models import Count, Q, IntegerField
+from django.db.models import Count
+from django.db.models import IntegerField
+from django.db.models import Q
 from django.db.models.functions import Cast
 
 from news import models
@@ -36,6 +38,12 @@ class EventAdmin(admin.ModelAdmin):
         return obj.all_count
 
 
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'event', 'medium']
+    list_filter = ['event', 'medium']
+    list_select_related = ('medium',)
+
+
 admin.site.register(models.Medium, MediumAdmin)
 admin.site.register(models.Event, EventAdmin)
-admin.site.register(models.Article)
+admin.site.register(models.Article, ArticleAdmin)
