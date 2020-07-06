@@ -166,6 +166,8 @@ CACHES = {
 
 CORS_ORIGIN_WHITELIST = [
     f'{os.getenv("ORIGIN_DOMAIN")}',
+    "https://newsgradient.org",
+    "https://bih.newsgradient.org",
 ]
 
 LOGIN_URL = '/admin/login/'
