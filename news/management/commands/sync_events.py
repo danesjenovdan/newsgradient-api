@@ -42,7 +42,7 @@ class Command(BaseCommand):
         er = EventRegistry(apiKey=key)
 
         q = QueryEventsIter(
-            dateStart=datetime.datetime.now() - datetime.timedelta(days=2),
+            dateStart=datetime.datetime.now() - datetime.timedelta(days=7),
             lang=QueryItems.OR(['hrv', 'srp'])
         )
         q.setRequestedResult(RequestEventsInfo(sortBy='size'))
