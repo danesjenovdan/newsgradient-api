@@ -16,8 +16,9 @@ from backoffice.services import update_mediums
 
 COMMANDS = [
     'clear_cache',
-    'sync_events',
-    'get_medium_favicons'
+    # 'sync_events',
+    # 'get_medium_favicons',
+    'fetch_new_articles',
 ]
 
 
