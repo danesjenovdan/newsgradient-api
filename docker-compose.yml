@@ -1,7 +1,10 @@
 version: '3'
+
 services:
   db:
     image: "postgres:11.5-alpine"
+    volumes:
+      - db-data:/var/lib/postgresql/data
     ports:
       - "127.0.0.1:65000:5432"
 
@@ -17,7 +20,7 @@ services:
     build: .
     environment:
       COMPOSE_HTTP_TIMEOUT: 300
-    command: bash -c "gunicorn -c gunicorn.conf.py newsgradient.wsgi --access-logfile - --error-logfile - --log-level debug  --reload"
+    command: bash -c "gunicorn -c gunicorn.conf.py newsgradient.wsgi --access-logfile - --error-logfile - --log-level debug --timeout 120 --reload"
     volumes:
       - .:/code
     env_file:
@@ -30,3 +33,6 @@ services:
     links:
       - db
       - cache
+
+volumes:
+  db-data:
