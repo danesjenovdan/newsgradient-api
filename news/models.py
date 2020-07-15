@@ -69,7 +69,7 @@ class Article(models.Model):
     datetime = models.DateTimeField()
     image = models.CharField(max_length=512, null=True, blank=True)
     medium = models.ForeignKey('Medium', related_name='articles', on_delete=models.CASCADE)
-    event = models.ForeignKey('Event', related_name='articles', on_delete=models.CASCADE, null=True)
+    event = models.ForeignKey('Event', related_name='articles', on_delete=models.CASCADE, null=True, blank=True)
 
     sentiment = models.FloatField(null=True, blank=True)
     sentimentRNN = models.FloatField(null=True, blank=True)
