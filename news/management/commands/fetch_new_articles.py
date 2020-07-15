@@ -29,6 +29,7 @@ class Command(BaseCommand):
         try:
             cache.set(constants.NEW_ARTICLES_FETCH_KEY, constants.CommandStatus.RUNNING.value)
             self.handle_impl()
+            call_command('update_event_uris')
             call_command('clear_cache')
         except Exception as e:
             self.stderr.write(f'Exception: {e}')

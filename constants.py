@@ -31,6 +31,7 @@ class CacheKeys:
     EVENT_ARTICLES = 'event-articles'
 
 
+UPDATE_EVENT_URIS_KEY = 'update_event_uris_key'
 NEW_ARTICLES_FETCH_KEY = 'new_articles_fetch_key'
 EVENT_FETCH_KEY = 'sync_events_command'
 ALL_ARTICLES_FETCH = 'all_articles_fetch'

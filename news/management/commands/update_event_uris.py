@@ -17,17 +17,17 @@ from pprint import pprint
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        if cache.get(constants.NEW_ARTICLES_FETCH_KEY) == constants.CommandStatus.RUNNING.value:
+        if cache.get(constants.UPDATE_EVENT_URIS_KEY) == constants.CommandStatus.RUNNING.value:
             self.stderr.write('Command already running!')
             return
         try:
-            cache.set(constants.NEW_ARTICLES_FETCH_KEY, constants.CommandStatus.RUNNING.value)
+            cache.set(constants.UPDATE_EVENT_URIS_KEY, constants.CommandStatus.RUNNING.value)
             self.handle_impl()
             call_command('clear_cache')
         except Exception as e:
             self.stderr.write(f'Exception: {e}')
             traceback.print_exc()
-        cache.set(constants.NEW_ARTICLES_FETCH_KEY, constants.CommandStatus.IDLE.value)
+        cache.set(constants.UPDATE_EVENT_URIS_KEY, constants.CommandStatus.IDLE.value)
 
     def handle_impl(self):
         key = os.getenv('ER_API_KEY')
