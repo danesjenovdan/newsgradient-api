@@ -50,7 +50,8 @@ class Command(BaseCommand):
             dateStart=datetime.datetime.now() - datetime.timedelta(days=7),
             isDuplicateFilter='skipDuplicates',
         )
-        self.stdout.write(f'Got articles: {q.count(er)}')
+        all_articles_count = q.count(er)
+        self.stdout.write(f'Got articles: {all_articles_count}')
         self.stdout.write('-' * 80)
 
         results = q.execQuery(
@@ -61,7 +62,11 @@ class Command(BaseCommand):
         newEventsCount = 0
         newArticlesCount = 0
 
+        count = 0
         for article in results:
+            count += 1
+            self.stdout.write(f'{count} / {all_articles_count}')
+
             articleUrl = article.get('url', '')
             if 'index.hr/oglasi' in articleUrl:
                 continue
