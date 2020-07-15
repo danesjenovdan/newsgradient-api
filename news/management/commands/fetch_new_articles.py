@@ -76,9 +76,6 @@ class Command(BaseCommand):
                 continue
 
             eventUri = article.get('eventUri', '')
-            if not eventUri:
-                continue # FIXME: handle non event articles
-
             # some fields have max length so truncate to prevent db errors
             articleUrl = articleUrl[:512]
             articleTitle = (article.get('title', '') or '')[:512]
@@ -90,7 +87,7 @@ class Command(BaseCommand):
             # self.stdout.write(f'articleUrl   = {articleUrl}')
             # self.stdout.write(f'eventUri     = {eventUri}')
 
-            if not Event.objects.filter(uri=eventUri).exists():
+            if eventUri and not Event.objects.filter(uri=eventUri).exists():
                 q = QueryEvent(eventUri)
                 q.setRequestedResult(RequestEventInfo())
                 res = er.execQuery(q)
