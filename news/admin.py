@@ -79,6 +79,7 @@ class EventAdmin(admin.ModelAdmin):
 
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ['title', 'event', 'medium']
+    search_fields = ['title', 'content']
     list_filter = ['event', 'medium']
     list_select_related = ('medium',)
 
