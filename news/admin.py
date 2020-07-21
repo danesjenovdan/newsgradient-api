@@ -82,6 +82,7 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content']
     list_filter = ['event', 'medium']
     list_select_related = ('medium',)
+    autocomplete_fields = ['event']
 
 
 admin.site.register(models.Medium, MediumAdmin)
