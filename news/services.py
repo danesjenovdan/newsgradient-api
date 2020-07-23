@@ -87,9 +87,8 @@ def get_event(event_uri):
 
 
 def determine_slant_from_bias(bias: float) -> Orientations:
-    if bias <= -4:
+    if bias < -3:
         return Orientations.LEFT
-    elif -4 <= bias <= 4:
-        return Orientations.NEUTRAL
-    else:
+    if bias > 3:
         return Orientations.RIGHT
+    return Orientations.NEUTRAL
