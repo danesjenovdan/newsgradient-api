@@ -1,0 +1,42 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation
+  delete-selected-confirmation{% endblock %}
+
+{% block content %}
+   {{ queryset }}
+  <p>Are you sure you want to {{ c_action }}?</p>
+  <br>
+  <hr>
+  <ul style="padding: 0">
+    This is parent event and all other selected events will be deleted.
+    <br>
+      <li style="list-style: none; float: left; margin: 5px">
+        * {{ parent_event.title }}
+      </li>
+  </ul>
+  <hr>
+  <br>
+  <ul style="padding: 0">
+    This events will be deleted. All articles of this event will be moved to parent event.
+    <br>
+    {% for object in other_events.all %}
+      <li style="list-style: none; float: left; margin: 5px">
+        * {{ object.title }}
+      </li>
+    {% endfor %}
+  </ul>
+  <hr>
+  <br>
+  <form action="" method="post">{% csrf_token %}
+    <div>
+        {% for obj in queryset %}
+            <input type="hidden" name="_selected_action" value="{{ obj.pk|unlocalize }}" />
+        {% endfor %}
+        <input type="hidden" name="post" value="yes" />
+        <input type="hidden" name="action" value="{{ action }}" />
+        <input type="submit" value="Confirm" />
+    </div>
+</form>
+{% endblock %}
