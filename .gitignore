@@ -63,7 +63,7 @@ target/
 # Static
 static/
 staticfiles/
-.vscode/.ropeproject/config.py
+.vscode/
 
 *.sqlite3
 

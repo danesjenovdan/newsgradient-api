@@ -30,7 +30,7 @@ def get_most_popular_events_with_articles(slant: int = Orientations.NEUTRAL):
             article['medium'] = mediums.get(article.get('medium_id'))
             event['image'] = article.get('image') if article.get('image') else None
         event['articles'] = articles[:3]
-        event['all_articles_count'] = articles.count()
+        event['articles_count'] = articles.count()
         if len(articles):
             d = datetime.utcnow() - articles[0].get('datetime').replace(tzinfo=None)
             hours = int(d.total_seconds() // 3600)

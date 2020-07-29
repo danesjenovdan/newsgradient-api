@@ -36,7 +36,8 @@ class EventSchema(Schema):
     date = fields.DateTime(dump_only=True)
     first_publish = fields.String(dump_only=True, data_key='firstPublish')
     articles = fields.Nested(ArticleSchema, many=True)
-    all_articles_count = fields.Int(dump_only=True, data_key='articleCount')
+    articles_count = fields.Int(dump_only=True, data_key='articleCount')
+    all_articles_count = fields.Int(dump_only=True, data_key='allArticlesCount')
 
 
 class TopEventQPSchema(Schema):

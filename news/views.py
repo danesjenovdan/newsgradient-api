@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 from common.views import SuperAPIView
 from constants import CacheKeys
 from constants import TimeRange
+from constants import Orientations
 from news import models
 from news import serializers
 from news.schemas import EventArticlesSchema
@@ -113,6 +114,8 @@ class TopEventsView(SuperAPIView):
     def get(self, request):
         # time_range = self.cleaned_qp.get('timerange')
         slant = self.cleaned_qp.get('slant')
+        if slant is None:
+            slant = Orientations.NEUTRAL.value
 
         cache_key = f'{CacheKeys.TOP_EVENTS}::{slant}'
         cached_value = cache.get(cache_key)
